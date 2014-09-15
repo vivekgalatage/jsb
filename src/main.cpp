@@ -188,7 +188,10 @@ void Print(const v8::FunctionCallbackInfo<v8::Value>& args) {
         v8::String::Utf8Value str(args[i]);
         string myStr = *(str);
         const char* cstr = myStr.c_str();
-        printf("%s%s %s", color, cstr, resetColor);
+        if (color)
+            printf("%s%s %s", color, cstr, resetColor);
+        else
+            printf("%s %s", cstr, resetColor);
     }
     printf("\n", NULL);
 }

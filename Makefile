@@ -24,17 +24,17 @@ CREATE_DIRECTORIES:
 	@mkdir -p $(OUTPUT_GENERATED_DIR)
 
 $(EXECUTABLE): generated.cpp $(OBJECTS)
-	$(CC) $(shell find out/ -iname '*.o') $(LDFLAGS) -o $(OUTPUT_DIR)/$@
-	@echo Link $@
+	@$(CC) $(shell find out/ -iname '*.o') $(LDFLAGS) -o $(OUTPUT_DIR)/$@
+	@echo Link $(OUTPUT_DIR)/$@
 
 generated.cpp: $(JAVASCRIPT_SOURCES)
-	@echo 'Generating sources from scripts:'
+	@echo 'Generating sources from scripts using python'
 	@python tools/scripts/js2string.py $(OUTPUT_GENERATED_DIR)/generated.cpp $(JAVASCRIPT_SOURCES)
 
 .cpp.o:
 	@mkdir -p $(dir $(OUTPUT_DIR)/$@)
-	$(CC) $(CFLAGS) $< -o $(OUTPUT_DIR)/$(subst out/,,$@)
-
+	@$(CC) $(CFLAGS) $< -o $(OUTPUT_DIR)/$(subst out/,,$@)
+	@echo CXX $<
 
 clean:
 	rm -rf $(OUTPUT_DIR)/*.o $(OUTPUT_GENERATED_DIR)/generated.cpp jsm

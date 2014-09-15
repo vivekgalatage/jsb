@@ -193,7 +193,7 @@ void Print(const v8::FunctionCallbackInfo<v8::Value>& args) {
         else
             printf("%s %s", cstr, resetColor);
     }
-    printf("\n", NULL);
+    printf("\n");
 }
 
 int main()

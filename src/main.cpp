@@ -160,19 +160,35 @@ void PointConstructor( const FunctionCallbackInfo<v8::Value>& args )
     args.GetReturnValue().Set(obj);
 }
 
-/*
-* JS Function: print(string, ...)
-* /a string value to be printed
-*/
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
 void Print(const v8::FunctionCallbackInfo<v8::Value>& args) {
-    std::cout << "Print worked= ";
-    
-    for (int i = 0; i < args.Length(); i++) {
+    const char* color = nullptr;
+    const char* resetColor = ANSI_COLOR_RESET;
+    if (!args[0].IsEmpty() && args[0]->IsNumber()) {
+        switch (args[0]->Int32Value()) {
+        case 1:
+            color = ANSI_COLOR_GREEN;
+            break;
+        case 2:
+            color = ANSI_COLOR_YELLOW;
+            break;
+        case 3:
+            color = ANSI_COLOR_RED;
+            break;
+        }
+    }
+    for (int i = 1; i < args.Length(); i++) {
         v8::HandleScope handle_scope(args.GetIsolate());
         v8::String::Utf8Value str(args[i]);
         string myStr = *(str);
         const char* cstr = myStr.c_str();
-        printf("%s", cstr);
+        printf("%s%s %s", color, cstr, resetColor);
     }
     printf("\n", NULL);
 }

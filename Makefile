@@ -1,16 +1,20 @@
-CC      = g++
-RM      = rm -f
-input 	:= src/main.cpp
+CC=g++
+CFLAGS=-c -Wall -Ithird-party/v8 -std=c++11
+LDFLAGS=-lv8 -Lthird-party/v8/out/native/lib.target 
+SOURCES= \
+	src/main.cpp 
 
-default: all
+OBJECTS=$(SOURCES:.cpp=.o)
 
-all: jsm
+EXECUTABLE=jsm
 
-main.o: 
-	$(CC) $(CFLAGS) -c src/main.cpp -Ithird-party/v8 -std=c++11
+all: $(SOURCES) $(EXECUTABLE)
+	
+$(EXECUTABLE): $(OBJECTS) 
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 
-jsm: main.o
-	$(CC) $(CFLAGSC) main.o -o jsm -lv8 -Lthird-party/v8/out/native/lib.target 
+.cpp.o:
+	$(CC) $(CFLAGS) $< -o $@
 
-clean veryclean:
-	$(RM) *.o jsm
+clean:
+	rm -rf *o jsm

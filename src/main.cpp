@@ -102,7 +102,7 @@ void print(const v8::FunctionCallbackInfo<v8::Value>& args) {
         if (color)
             printf("%s%s %s", color, cstr, resetColor);
         else
-            printf("%s %s", cstr, resetColor);
+            printf("%s", cstr);
     }
     printf("\n");
 }
@@ -122,7 +122,6 @@ void compileAndExecuteScript(const Handle<v8::String>& scriptSource)
 void setupGlobalEnvironment()
 {
     for (size_t i = 0; i < sizeof(kJSMScriptSources)/sizeof(JSMScriptSources); ++i) {
-        printf("%s\n", kJSMScriptSources[i].scriptSource);
         compileAndExecuteScript(v8::String::NewFromUtf8(isolate,
                                                         kJSMScriptSources[i].scriptSource,
                                                         v8::String::kNormalString,
@@ -130,8 +129,13 @@ void setupGlobalEnvironment()
     }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+    if (argc < 2) {
+        //TODO: Print usage here
+        printf("Print Usage\n");
+        return 0;
+    }
     isolate = Isolate::New();
     Isolate::Scope isolate_scope(isolate);
     HandleScope handle_scope(isolate);
@@ -146,42 +150,25 @@ int main()
 
     global->Set(v8::String::NewFromUtf8(isolate, "print"), v8::FunctionTemplate::New(isolate, print)->GetFunction());
     setupGlobalEnvironment();
-    string file = "foo.js";
+    string file(argv[1]);
 
-    while(true){
-        cout << "How many times do you want to run the script? \n" << endl;
+    Handle<String> source = ReadFile(file.c_str());
 
-        int n; 
+    if(source.IsEmpty())
+    {
+        cout << "Error reading file" << endl;
+        cout << "Press enter to quit" << endl;
+        cin.get();
+        return 0;
+    }
 
-        cin >> n;
+    //Compile
+    Handle<Script> script = Script::Compile(source);
 
-        cout << "" << endl;
+    //Run the script and print
+    Handle<Value> result;
 
-        std::cin.get();
-
-        Handle<String> source = ReadFile(file.c_str());
-
-        if(source.IsEmpty())
-        {
-            cout << "Error reading file" << endl;
-            cout << "Press enter to quit" << endl;
-            cin.get();
-            return 0;
-        }
-
-        //Compile
-        Handle<Script> script = Script::Compile(source);
-    
-        //Run the script and print 
-        Handle<Value> result;
-
-        result = script->Run();
-
-    } // End of while
-
-    //Exit program
-    cout << "\nTest completed.  Press enter to exit program. \n" << endl;
-    std::cin.get();
+    result = script->Run();
     
     return 0;
 }

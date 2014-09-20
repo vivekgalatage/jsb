@@ -1,14 +1,51 @@
 function JSB() {
+    this.os = new OS();
     this._artifacts = {};
 }
 
 JSB.prototype = {
-    TYPE_EXECUTABLE: 1,
-    TYPE_SHARED_LIBRARY: 2,
-    TYPE_STATIC_LIBRARY: 3,
-    TYPE_ACTION: 4,
-    TYPE_CONFIG: 5,
-    TYPE_SOURCE_LIST: 6,
+    EXECUTABLE: 1,
+    SHARED_LIBRARY: 2,
+    STATIC_LIBRARY: 3,
+    ACTION: 4,
+    CONFIG: 5,
+    SOURCE_LIST: 6,
+
+    library: function(name, type, depsList, libraryDefinition) {
+        this._declareArtifact(this._toArgumentsObject(name, type, depsList, libraryDefinition));
+    },
+
+    executable: function(name, depsList, executableDefinition) {
+        this._declareArtifact(this._toArgumentsObject(name, this.TYPE_EXECUTABLE, depsList, libraryDefinition));
+    },
+
+    action: function(name, depsList, actionDefinition) {
+        this._declareArtifact(this._toArgumentsObject(name, this.TYPE_ACTION, depsList, libraryDefinition));
+    },
+
+    build: function() {
+        for (var name in this._artifacts) {
+            var artifact = this._artifacts[name];
+            if (artifact.definition instanceof Function) {
+                var artifcatObject = null;
+                switch (artifact.type) {
+                case this.STATIC_LIBRARY:
+                    artifcatObject = {};
+                    break;
+                }
+                artifact.definition(artifcatObject);
+                if (!artifcatObject.outputName) {
+                    console.error('Library ' + name + ' must specify outputName');
+                    throw "Invalid configuration error";
+                }
+
+                if (artifcatObject.sourceds.length === 0) {
+                    console.warn('Library ' + name + ' has empty sources');
+                }
+
+            }
+        }
+    },
 
     _isString: function(str) {
         return typeof str === 'string' || str instanceof String; 
@@ -47,24 +84,19 @@ JSB.prototype = {
         };
     },
 
-    library: function(name, type, depsList, libraryDefinition) {
-        this._declareArtifact(this._toArgumentsObject(name, type, depsList, libraryDefinition));
-    },
-
-    executable: function(name, depsList, executableDefinition) {
-        this._declareArtifact(this._toArgumentsObject(name, this.TYPE_EXECUTABLE, depsList, libraryDefinition));
-    },
-
-    action: function(name, depsList, actionDefinition) {
-        this._declareArtifact(this._toArgumentsObject(name, this.TYPE_ACTION, depsList, libraryDefinition));
-    },
-
     _declareArtifact: function(artifact) {
-        console.log(artifact.name);
-        console.log(artifact.type);
-        console.log(artifact.depsList.join(", "));
-        console.log(artifact.definition);
-        console.warn('........');
+        this._artifacts[artifact.name] = artifact;
+    },
+};
+
+function OS() {
+    this._name = "linux";
+    this._version = "linux-mint-17";
+}
+
+OS.prototype = {
+    get name() {
+        return this._name;
     }
 };
 

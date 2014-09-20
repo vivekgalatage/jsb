@@ -1,2 +1,2 @@
-jsm.library('lib1', jsm.TYPE_STATIC_LIBRARY, function() {});
-jsm.library('lib2', jsm.TYPE_STATIC_LIBRARY, ['lib1'], function() {});
+jsb.library('lib1', jsb.TYPE_STATIC_LIBRARY, function() {});
+jsb.library('lib2', jsb.TYPE_STATIC_LIBRARY, ['lib1'], function() {});

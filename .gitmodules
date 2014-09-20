@@ -1,0 +1,3 @@
+[submodule "third-party/v8"]
+	path = third-party/v8
+	url = https://chromium.googlesource.com/external/v8.git

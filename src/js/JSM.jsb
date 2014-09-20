@@ -1,8 +1,8 @@
-function JSM() {
+function JSB() {
     this._artifacts = {};
 }
 
-JSM.prototype = {
+JSB.prototype = {
     TYPE_EXECUTABLE: 1,
     TYPE_SHARED_LIBRARY: 2,
     TYPE_STATIC_LIBRARY: 3,
@@ -68,4 +68,4 @@ JSM.prototype = {
     }
 };
 
-jsm = new JSM();
+jsb = new JSB();

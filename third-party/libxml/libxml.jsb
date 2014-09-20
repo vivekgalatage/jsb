@@ -10,12 +10,12 @@ jsb.library('libxml', jsb.STATIC_LIBRARY, function(libxml) {
         console.warn('libxml: Unsupported OS "' + jsb.os.name + '" specified.');
         return;
     }
-    
+
     if (jsb.os.name === 'win')
         osInclude = osInclude + '32';
 
     libxml.outputName = 'libxml2';
-    libxml.cflags = [];
+    libxml.cflags = [ '-MMD', '-MF' ];
     libxml.ldflags = [ '-pthread' ];
     libxml.includePaths = [
         'src/include',
@@ -138,24 +138,25 @@ jsb.library('libxml', jsb.STATIC_LIBRARY, function(libxml) {
 
     console.log('echo "Building: ' + libxml.outputName + '"');
     var command = '';
-    var expandedIncludePath = '-I' + libxml.includePaths.sort().join(' -I')
-    var expandedCFlags = libxml.cflags.sort().join(' ');
+    var expandedIncludePath = '-I' + libxml.includePaths.join(' -I')
+    var expandedCFlags = libxml.cflags.join(' ');
     var cFilter = /^.*\.(c){1}$/;
     var cppFilter = /^.*\.(cc|cpp|C|CPP){1}$/;
     var objectFiles = [];
     for (var i = 0; i < libxml.sources.length; ++i) {
         var source = libxml.sources[i];
+        var objectFile = source.replace(/(c|cc|C|CPP){1}$/g, 'o');
         if (cFilter.test(source))
             command = 'cc';
         else if (cppFilter.test(source))
-            command = 'c++'; 
-        else 
+            command = 'c++';
+        else
             continue;
-        command += ' ' + expandedCFlags;
+        command += ' ' + expandedCFlags + ' ' + objectFile + '.d';
         command += ' ' + expandedIncludePath;
         command += ' ' + libxml.ldflags.join(' ');
         command += ' -c ' + source;
-        var objectFile = source.replace(/(c|cc|C|CPP){1}$/g, 'o');
+
         objectFiles.push(objectFile);
         command += ' -o ' + objectFile;
         console.log(command);

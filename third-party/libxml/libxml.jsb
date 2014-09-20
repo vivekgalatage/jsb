@@ -15,9 +15,11 @@ jsb.library('libxml', jsb.STATIC_LIBRARY, function(libxml) {
         osInclude = osInclude + '32';
 
     libxml.outputName = 'libxml2';
-    libxml.cflags = [ '-DLIBXML_STATIC' ];
+    libxml.cflags = [];
+    libxml.ldflags = [ '-pthread' ];
     libxml.includePaths = [
         'src/include',
+        osInclude,
         osInclude + '/include'
     ];
     libxml.sourceds = [];
@@ -151,7 +153,8 @@ jsb.library('libxml', jsb.STATIC_LIBRARY, function(libxml) {
             continue;
         command += ' ' + expandedCFlags;
         command += ' ' + expandedIncludePath;
-        command += ' ' + source;
+        command += ' ' + libxml.ldflags.join(' ');
+        command += ' -c ' + source;
         var objectFile = source.replace(/(c|cc|C|CPP){1}$/g, 'o');
         objectFiles.push(objectFile);
         command += ' -o ' + objectFile;

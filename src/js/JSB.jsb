@@ -38,11 +38,6 @@ JSB.prototype = {
                     console.error('Library ' + name + ' must specify outputName');
                     throw "Invalid configuration error";
                 }
-
-                if (artifcatObject.sourceds.length === 0) {
-                    console.warn('Library ' + name + ' has empty sources');
-                }
-
             }
         }
     },
@@ -90,13 +85,17 @@ JSB.prototype = {
 };
 
 function OS() {
-    this._name = "linux";
-    this._version = "linux-mint-17";
+    this._name = 'linux';
+    this._arch = 'x86_64';
 }
 
 OS.prototype = {
     get name() {
         return this._name;
+    },
+
+    get arch() {
+        return this._arch;
     }
 };
 

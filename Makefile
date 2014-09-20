@@ -23,14 +23,16 @@ OBJECTS=$(SOURCES:.cpp=.o)
 all: submodule_update build_third_party_libs CREATE_DIRECTORIES $(EXECUTABLE)
 
 submodule_update:
-	-test -d .git -a .gitmodules && \
+	@echo "Updating submodules..."
+	@-test -d .git -a .gitmodules && \
 		git submodule init -- && \
 		git submodule update --depth 1 --
 
 build_third_party_libs: submodule_update
-	cd third-party/v8 && \
-		make builddeps && \
-		make native
+	@echo "Building v8 dependencies..."
+	@cd third-party/v8 && \
+		make --silent builddeps && \
+		make --silent native
 
 CREATE_DIRECTORIES:
 	@mkdir -p $(OUTPUT_DIR)

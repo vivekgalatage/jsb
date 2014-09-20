@@ -13,10 +13,10 @@ INCLUDE_PATHS := \
 	$(OUTPUT_GENERATED_DIR)
 
 JAVASCRIPT_SOURCES := \
-	src/js/Console.jsm \
-	src/js/JSM.jsm
+	src/js/Console.jsb \
+	src/js/JSB.jsb
 
-EXECUTABLE := jsm
+EXECUTABLE := jsb
 
 OBJECTS=$(SOURCES:.cpp=.o)
 
@@ -40,7 +40,7 @@ generated.h: $(JAVASCRIPT_SOURCES)
 	@echo CXX $<
 
 clean:
-	rm -rf $(OUTPUT_DIR)/*.o $(OUTPUT_GENERATED_DIR)/generated.cpp jsm
+	rm -rf $(OUTPUT_DIR)/*.o $(OUTPUT_GENERATED_DIR)/generated.cpp jsb
 
 distclean:
 	@echo -n "Cleaning all the targets..."

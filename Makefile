@@ -20,7 +20,12 @@ EXECUTABLE := jsb
 
 OBJECTS=$(SOURCES:.cpp=.o)
 
-all: CREATE_DIRECTORIES $(EXECUTABLE)
+all: submodule_update CREATE_DIRECTORIES $(EXECUTABLE)
+
+submodule_update:
+	-test -d .git -a .gitmodules && \
+	git submodule init -- && \
+	git submodule update --depth 1 --
 
 CREATE_DIRECTORIES:
 	@mkdir -p $(OUTPUT_DIR)
@@ -46,3 +51,5 @@ distclean:
 	@echo -n "Cleaning all the targets..."
 	@rm -rf $(OUTPUT_DIR)
 	@echo "Done"
+
+.PHONY: all sumodule_check clean distclean

@@ -27,7 +27,9 @@ all: submodule_check CREATE_DIRECTORIES $(EXECUTABLE)
 
 submodule_check:
 	@echo "Verifying third-party dependencies..."
-	@-test -f third-party/v8/out/native/lib.target/libv8.so || echo "You need to run 'make builddeps' first."
+	@-test -f third-party/v8/out/native/lib.target/libv8.so || \
+		echo "Unmet dependencies! Running 'make builddeps' first." && \
+		make builddeps
 
 builddeps: build_third_party_libs
 

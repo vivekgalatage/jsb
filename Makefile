@@ -5,7 +5,14 @@ OUTPUT_GENERATED_DIR := $(OUTPUT_DIR)/gen
 
 CC := g++
 CFLAGS := -Wall -std=c++11
-LDFLAGS := -lv8 -Lthird-party/v8/out/native/lib.target -Wl,-rpath,$(OUTPUT_DIR)
+LDFLAGS := third-party/v8/out/native/obj.target/tools/gyp/libv8_base.a \
+	third-party/v8/out/native/obj.target/tools/gyp/libv8_libbase.a \
+	third-party/v8/out/native/obj.target/tools/gyp/libv8_libplatform.a \
+	third-party/v8/out/native/obj.target/tools/gyp/libv8_snapshot.a \
+	third-party/v8/out/native/obj.target/third_party/icu/libicui18n.a \
+	third-party/v8/out/native/obj.target/third_party/icu/libicuuc.a \
+	third-party/v8/out/native/obj.target/third_party/icu/libicudata.a \
+	-pthread
 
 
 SOURCES := \
@@ -45,7 +52,14 @@ build_third_party_libs: submodule_update
 		make --silent builddeps && \
 		make --silent native
 	@echo "Copying files..."
-	cp third-party/v8/out/native/lib.target/lib*.so $(OUTPUT_DIR)
+	cp third-party/v8/out/native/obj.target/tools/gyp/libv8_base.a \
+	third-party/v8/out/native/obj.target/tools/gyp/libv8_libbase.a \
+	third-party/v8/out/native/obj.target/tools/gyp/libv8_libplatform.a \
+	third-party/v8/out/native/obj.target/tools/gyp/libv8_snapshot.a \
+	third-party/v8/out/native/obj.target/third_party/icu/libicui18n.a \
+	third-party/v8/out/native/obj.target/third_party/icu/libicuuc.a \
+	third-party/v8/out/native/obj.target/third_party/icu/libicudata.a \
+	$(OUTPUT_DIR)
 
 CREATE_DIRECTORIES:
 	@mkdir -p $(OUTPUT_DIR)

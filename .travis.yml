@@ -1,0 +1,4 @@
+language: python
+script:
+  make
+  out/jsb third-party/libxml/libxml.jsb

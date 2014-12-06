@@ -1,20 +1,9 @@
-CC := cc
-CXX := c++
+CC := gcc
+CXX := g++
 OUTPUT_DIR := out
 OUTPUT_GENERATED_DIR := $(OUTPUT_DIR)/gen
 
-CC := g++
 CFLAGS := -Wall -std=c++11
-LDFLAGS := third-party/v8/out/native/obj.target/tools/gyp/libv8_base.a \
-	third-party/v8/out/native/obj.target/tools/gyp/libv8_libbase.a \
-	third-party/v8/out/native/obj.target/tools/gyp/libv8_libplatform.a \
-	third-party/v8/out/native/obj.target/tools/gyp/libv8_snapshot.a \
-	third-party/v8/out/native/obj.target/third_party/icu/libicui18n.a \
-	third-party/v8/out/native/obj.target/third_party/icu/libicuuc.a \
-	third-party/v8/out/native/obj.target/third_party/icu/libicudata.a \
-	-pthread
-
-
 SOURCES := \
 	src/main.cpp
 
@@ -34,9 +23,8 @@ all: submodule_check CREATE_DIRECTORIES $(EXECUTABLE)
 
 submodule_check:
 	@echo "Verifying third-party dependencies..."
-	@-test -f third-party/v8/out/native/lib.target/libv8.so || \
-		echo "Unmet dependencies! Running 'make builddeps' first." && \
-		make builddeps
+	@-test -d ./third-party/v8/out/native || \
+		(echo "Unmet dependencies! Running 'make builddeps' first." && make builddeps)
 
 builddeps: build_third_party_libs
 
@@ -52,6 +40,7 @@ build_third_party_libs: submodule_update
 		make --silent builddeps && \
 		make --silent native
 	@echo "Copying files..."
+	cd ../../
 	cp third-party/v8/out/native/obj.target/tools/gyp/libv8_base.a \
 	third-party/v8/out/native/obj.target/tools/gyp/libv8_libbase.a \
 	third-party/v8/out/native/obj.target/tools/gyp/libv8_libplatform.a \
@@ -66,7 +55,7 @@ CREATE_DIRECTORIES:
 	@mkdir -p $(OUTPUT_GENERATED_DIR)
 
 $(EXECUTABLE): generated.h $(OBJECTS)
-	LD_LIBRARY_PATH=out/ $(CC) $(shell find out/ -iname '*.o') $(LDFLAGS) -o $(OUTPUT_DIR)/$@
+	$(CXX) $(shell find out/ -iname '*.o') out/libv8_base.a out/libv8_libbase.a out/libv8_libplatform.a  out/libv8_snapshot.a out/libicui18n.a out/libicuuc.a out/libicudata.a -pthread -o $(OUTPUT_DIR)/$@
 	@echo Link $(OUTPUT_DIR)/$@
 
 generated.h: $(JAVASCRIPT_SOURCES)
@@ -75,7 +64,7 @@ generated.h: $(JAVASCRIPT_SOURCES)
 
 .cpp.o:
 	@mkdir -p $(dir $(OUTPUT_DIR)/$@)
-	$(CC) -c $(CFLAGS) $(foreach path,$(INCLUDE_PATHS),-I$(path)) $< -o $(OUTPUT_DIR)/$(subst out/,,$@)
+	$(CXX) -c $(CFLAGS) $(foreach path,$(INCLUDE_PATHS),-I$(path)) $< -o $(OUTPUT_DIR)/$(subst out/,,$@)
 	@echo CXX $<
 
 clean:

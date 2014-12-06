@@ -1,4 +1,4 @@
 language: cpp
 script:
-  - make
+  - g++ --version
   - out/jsb third-party/libxml/libxml.jsb

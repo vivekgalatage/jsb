@@ -1,5 +1,31 @@
-box: wercker/default
-build:
-  steps:
-    - make
-    - out/jsb third-party/libxml/libxml.jsb
+name: gcc-cpp
+version: 0.0.1
+inherits: wercker/default@0.0.1
+type: service
+platform: ubuntu@14.04
+description: Wercker box for using GCC C++
+keywords:
+    - gcc
+    - c++
+    - autotools
+packages:
+    - make@3.81
+    - gcc@4.6.3
+    - binutils@2.22
+    - automake@1.11.3
+    - autoconf@2.68
+    - libtool@2.4.2
+    - git@1.8.5.1
+script: |
+    sudo apt-get update -y
+    sudo apt-get install make -y
+    sudo apt-get install binutils -y
+    sudo apt-get install g++ -y
+    sudo apt-get install automake -y
+    sudo apt-get install autoconf -y
+    sudo apt-get install libtool -y
+    g++ --version
+    make --version
+    autoconf --version    
+    automake --version
+    libtool --version

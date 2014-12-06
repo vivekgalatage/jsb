@@ -1,1 +1,5 @@
 box: wercker/default
+build:
+  steps:
+    - make
+    - out/jsb third-party/libxml/libxml.jsb

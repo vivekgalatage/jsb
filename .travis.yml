@@ -1,4 +1,5 @@
 language: cpp
+compiler: clang
 script:
   - chmod +x bin/jsb
   - bin/jsb third-party/libxml/libxml.jsb

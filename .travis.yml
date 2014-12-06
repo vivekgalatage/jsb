@@ -1,6 +1,10 @@
 language: cpp
 compiler: clang
 script:
+  - export CC=clang
+  - export CXX=clang++
+  - alias gcc=clang
+  - alias g++=clang++
   - objdump -p bin/jsb | grep GLIBC
-  - chmod +x bin/jsb
-  - bin/jsb third-party/libxml/libxml.jsb
+  - make
+  - out/jsb third-party/libxml/libxml.jsb

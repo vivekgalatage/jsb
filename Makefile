@@ -38,7 +38,7 @@ build_third_party_libs: submodule_update
 	@echo "Building v8 dependencies..."
 	@cd third-party/v8 && \
 		make --silent builddeps && \
-		make --silent native
+		make --silent native && cd -
 	@echo "Copying files..."
 	cd ../../
 	cp third-party/v8/out/native/obj.target/tools/gyp/libv8_base.a \

@@ -24,9 +24,7 @@ all: CREATE_DIRECTORIES submodule_check $(EXECUTABLE)
 submodule_check:
 	@echo "Verifying third-party dependencies..."
 	@-test -d ./third-party/v8/out/native || \
-		(echo "Unmet dependencies! Running 'make builddeps' first." && make builddeps)
-
-builddeps: build_third_party_libs
+		(echo "Unmet dependencies! Running 'make builddeps' first." && make build_third_party_libs)
 
 submodule_update:
 	@echo "Updating submodules..."
@@ -63,7 +61,8 @@ $(EXECUTABLE): generated.h $(OBJECTS)
 		out/libicui18n.a \
 		out/libicuuc.a \
 		out/libicudata.a \
-		-lrt -pthread -o $(OUTPUT_DIR)/$@
+		-o2 -lrt -pthread -o $(OUTPUT_DIR)/$@
+	@strip out/jsb
 
 generated.h: $(JAVASCRIPT_SOURCES)
 	@echo 'Generating sources from scripts using python'

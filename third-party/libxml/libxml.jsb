@@ -1,20 +1,20 @@
-jsb.library('libxml', jsb.STATIC_LIBRARY, function(libxml) {
+jsb.staticLibrary('libxml', function(libxml) {
     var osInclude = '';
-    switch (jsb.os.name) {
+    switch (os.name) {
     case 'linux':
     case 'mac':
     case 'win':
-        osInclude = jsb.os.name;
+        osInclude = os.name;
         break;
     default:
-        console.warn('libxml: Unsupported OS "' + jsb.os.name + '" specified.');
+        console.warn('libxml: Unsupported OS "' + os.name + '" specified.');
         return;
     }
 
-    if (jsb.os.name === 'win')
+    if (os.name === 'win')
         osInclude = osInclude + '32';
 
-    libxml.outputName = 'libxml2';
+    libxml.name = 'libxml2';
     libxml.cflags = [ '-MMD', '-MF' ];
     libxml.ldflags = [ '-pthread' ];
     libxml.includePaths = [
@@ -22,7 +22,6 @@ jsb.library('libxml', jsb.STATIC_LIBRARY, function(libxml) {
         osInclude,
         osInclude + '/include'
     ];
-    libxml.sourceds = [];
     libxml.sources = [
         'chromium/libxml_utils.cc',
         'chromium/libxml_utils.h',
@@ -136,7 +135,7 @@ jsb.library('libxml', jsb.STATIC_LIBRARY, function(libxml) {
         'win32/include/libxml/xmlversion.h',
     ];
 
-    console.log('echo "Building: ' + libxml.outputName + '"');
+    console.log('echo "Building: ' + libxml.name + '"');
     var command = '';
     var expandedIncludePath = '-I' + libxml.includePaths.join(' -I')
     var expandedCFlags = libxml.cflags.join(' ');
@@ -162,7 +161,7 @@ jsb.library('libxml', jsb.STATIC_LIBRARY, function(libxml) {
         console.log(command);
     }
     var archiveCommand = 'ar rcsT';
-    archiveCommand += ' ' + libxml.outputName + '.a';
+    archiveCommand += ' ' + libxml.name + '.a';
     archiveCommand += ' ' + objectFiles.join(' ');
     console.log(archiveCommand);
     console.log('echo "All Done"');

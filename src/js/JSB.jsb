@@ -1,5 +1,5 @@
-function JSB() {
-    this.os = new OS();
+function JSB()
+{
     this._artifacts = {};
 }
 
@@ -11,80 +11,152 @@ JSB.prototype = {
     CONFIG: 5,
     SOURCE_LIST: 6,
 
-    library: function(name, type, depsList, libraryDefinition) {
-        this._declareArtifact(this._toArgumentsObject(name, type, depsList, libraryDefinition));
+    var: function(name, value)
+    {
+        jsb[name] = value;
     },
 
-    executable: function(name, depsList, executableDefinition) {
-        this._declareArtifact(this._toArgumentsObject(name, this.TYPE_EXECUTABLE, depsList, libraryDefinition));
+    action: function(name, depsList, definition)
+    {
+        this._define(this.ACTION, name, depsList, definition);
     },
 
-    action: function(name, depsList, actionDefinition) {
-        this._declareArtifact(this._toArgumentsObject(name, this.TYPE_ACTION, depsList, libraryDefinition));
+    executable: function(name, depsList, definition)
+    {
+        this._define(this.EXECUTABLE, name, depsList, definition);
     },
 
-    build: function() {
+    staticLibrary: function(name, depsList, definition)
+    {
+        this._define(this.STATIC_LIBRARY, name, depsList, definition);
+    },
+
+    sharedLibrary: function(name, depsList, definition)
+    {
+        this._define(this.SHARED_LIBRARY, name, depsList, definition);
+    },
+
+    build: function()
+    {
         for (var name in this._artifacts) {
             var artifact = this._artifacts[name];
             if (artifact.definition instanceof Function) {
-                var artifcatObject = null;
                 switch (artifact.type) {
-                case this.STATIC_LIBRARY:
-                    artifcatObject = {};
+                case this.ACTION:
+                    this._handleAction(artifact, name);
                     break;
-                }
-                artifact.definition(artifcatObject);
-                if (!artifcatObject.outputName) {
-                    console.error('Library ' + name + ' must specify outputName');
-                    throw "Invalid configuration error";
+                case this.EXECUTABLE:
+                    this._handleExecutable(artifact, name);
+                    break;
+                case this.STATIC_LIBRARY:
+                    this._handleStaticLibrary(artifact, name);
+                    break;
                 }
             }
         }
     },
 
-    _isString: function(str) {
-        return typeof str === 'string' || str instanceof String; 
+    _define: function(type, name, depsList, definition)
+    {
+        this._artifacts[name] = this._toArgumentsObject(type, depsList, definition);
     },
 
-    _isNumber: function(num) {
-        return typeof num === 'number' || num instanceof Number; 
+    _handleAction: function(artifact, name)
+    {
+        artifactType = 'Action';
+        if (name)
+            console.log('Executing action: ' + name);
+
+        artifactObject = { name: name };
+        if (artifact.definition)
+            artifact.definition(artifactObject);
+        else
+            artifactObject.command = artifact;
+
+        if (typeof artifactObject.command !== 'string' && !(artifactObject.command instanceof Array)) {
+            console.error('Action \'' + name + '\' must specify \'command\' attribute either as \'string\' or \'array\'.');
+            throw 'Invalid configuration error';
+        }
+
+        if (typeof artifactObject.command === 'string') {
+            console.log('\tExecute action: ' + artifactObject.command);
+        } else {
+            var commands = artifactObject.command;
+            for (var i = 0; i < commands.length; ++i) {
+                this._handleAction(commands[i], commands[i].name);
+            }
+        }
+        if (name)
+            fs.cd(fs.lwd);
     },
 
-    _toArgumentsObject: function (name, type, depsList, definition) {
-        if (arguments.length <= 3) 
+    _handleExecutable: function(artifact, name)
+    {
+        artifactType = 'Executable';
+        console.log('Building executable: ' + name);
+        artifactObject = { name: name };
+        artifact.definition(artifactObject);
+        if (!artifactObject.name) {
+            console.error(artifactType + ' \'' + name + '\' must specify \'name\' attribute.');
+            throw 'Invalid configuration error';
+        }
+    },
+
+    _handleStaticLibrary: function(artifact, name)
+    {
+        var artifactType = '';
+        var artifactObject = null;
+        artifactType = 'Static-Library';
+        console.log('Building static library: ' + name);
+        artifactObject = { name: name };
+        artifact.definition(artifactObject);
+        if (!artifactObject.name) {
+            console.error(artifactType + ' \'' + name + '\' must specify \'name\' attribute.');
+            throw 'Invalid configuration error';
+        }
+    },
+
+    _isString: function(str)
+    {
+        return typeof str === 'string' || str instanceof String;
+    },
+
+    _isNumber: function(num)
+    {
+        return typeof num === 'number' || num instanceof Number;
+    },
+
+    _toArgumentsObject: function (type, depsList, definition)
+    {
+        if (arguments.length < 3)
             throw 'Requires minimum 3 arguments, ' + arguments.length + ' passed.';
-        if (!this._isString(name))
-            throw 'Invalid type passed for "name"';
 
         if (!this._isNumber(type))
-            throw 'Invaild type passed for "type"';
+            throw 'Invaild type passed for \'type\'';
 
         var deps = null;
-        if (depsList instanceof Array) {
-            deps = depsList;
-        } else if (depsList instanceof Function) {
+        if (depsList instanceof Function) {
             definition = depsList;
             delete depsList;
             deps = [];
+        } else if (depsList instanceof Array) {
+            deps = depsList;
         } else {
-            throw "Unknow parameters";
+            throw depsList + ' must be either Array or Function';
         }
 
         definition = definition;
         return {
-            name: name,
             type: type,
             depsList: deps,
             definition: definition
         };
     },
-
-    _declareArtifact: function(artifact) {
-        this._artifacts[artifact.name] = artifact;
-    },
 };
 
-function OS() {
+// TOOD(vivekg): Auto-generate this class
+function OS()
+{
     this._name = 'linux';
     this._arch = 'x86_64';
 }
@@ -99,4 +171,60 @@ OS.prototype = {
     }
 };
 
+// TOOD(vivekg): Auto-generate this class
+function Environment()
+{
+    this._vars = {};
+
+    this._vars['PATH'] = 'some/path/here:and/there';
+    this._vars['DISPLAY'] = ':0';
+    this._vars['HOME'] = '/home/vivekg';
+    this._vars['CXX'] = 'clang++';
+    this._vars['CC'] = 'clang';
+}
+
+Environment.prototype = {
+    get: function(key, defaultValue)
+    {
+        if (key in this._vars)
+            return this._vars[key];
+        return defaultValue;
+    }
+};
+
+function FileSystem()
+{
+    this._pwd = '.';
+    this._lwd = this._pwd;
+}
+
+FileSystem.prototype = {
+    get pwd()
+    {
+        return this._pwd;
+    },
+
+    get lwd()
+    {
+        return this._lwd;
+    },
+
+    cd: function(dir)
+    {
+        this._lwd = this._pwd;
+        this._pwd = dir;
+    },
+
+    cp: function(source, destination)
+    {
+        if (source instanceof Array)
+            source = source.join(' ');
+        console.warn('\tcp ' + source + ' ' + destination);
+    }
+
+};
+
 jsb = new JSB();
+os = new OS();
+env = new Environment();
+fs = new FileSystem();

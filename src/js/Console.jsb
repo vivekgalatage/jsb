@@ -1,5 +1,5 @@
-function Console() {
-
+function Console()
+{
 }
 
 Console.prototype = {
@@ -7,19 +7,23 @@ Console.prototype = {
     INFO: 1,
     WARN: 2,
     ERROR: 3,
-    log: function(message) {
+    log: function(message)
+    {
         print(this.LOG, message);
     },
 
-    info: function(message) {
+    info: function(message)
+    {
         print(this.INFO, message);
     },
 
-    warn: function(message) {
+    warn: function(message)
+    {
         print(this.WARN, message);
     },
 
-    error: function(message) {
+    error: function(message)
+    {
         print(this.ERROR, message);
     }
 }

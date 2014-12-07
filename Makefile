@@ -63,7 +63,7 @@ $(EXECUTABLE): generated.h $(OBJECTS)
 		out/libicui18n.a \
 		out/libicuuc.a \
 		out/libicudata.a \
-		-pthread -o $(OUTPUT_DIR)/$@
+		-lrt -pthread -o $(OUTPUT_DIR)/$@
 
 generated.h: $(JAVASCRIPT_SOURCES)
 	@echo 'Generating sources from scripts using python'

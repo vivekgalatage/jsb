@@ -32,7 +32,7 @@ submodule_update:
 	@echo "Updating submodules..."
 	@-test -d .git -a .gitmodules && \
 		git submodule init -- && \
-		git submodule update --depth 1 --
+		git submodule update --
 
 build_third_party_libs: submodule_update
 	@echo "Building v8 dependencies..."

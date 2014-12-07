@@ -1,5 +1,5 @@
-CC := gcc
-CXX := g++
+CC ?= gcc
+CXX ?= g++
 OUTPUT_DIR := out
 OUTPUT_GENERATED_DIR := $(OUTPUT_DIR)/gen
 
@@ -19,7 +19,7 @@ EXECUTABLE := jsb
 
 OBJECTS=$(SOURCES:.cpp=.o)
 
-all: submodule_check CREATE_DIRECTORIES $(EXECUTABLE)
+all: CREATE_DIRECTORIES submodule_check $(EXECUTABLE)
 
 submodule_check:
 	@echo "Verifying third-party dependencies..."
@@ -40,23 +40,30 @@ build_third_party_libs: submodule_update
 		make --silent builddeps && \
 		make --silent native && cd -
 	@echo "Copying files..."
-	cd ../../
 	cp third-party/v8/out/native/obj.target/tools/gyp/libv8_base.a \
-	third-party/v8/out/native/obj.target/tools/gyp/libv8_libbase.a \
-	third-party/v8/out/native/obj.target/tools/gyp/libv8_libplatform.a \
-	third-party/v8/out/native/obj.target/tools/gyp/libv8_snapshot.a \
-	third-party/v8/out/native/obj.target/third_party/icu/libicui18n.a \
-	third-party/v8/out/native/obj.target/third_party/icu/libicuuc.a \
-	third-party/v8/out/native/obj.target/third_party/icu/libicudata.a \
-	$(OUTPUT_DIR)
+		third-party/v8/out/native/obj.target/tools/gyp/libv8_libbase.a \
+		third-party/v8/out/native/obj.target/tools/gyp/libv8_libplatform.a \
+		third-party/v8/out/native/obj.target/tools/gyp/libv8_snapshot.a \
+		third-party/v8/out/native/obj.target/third_party/icu/libicui18n.a \
+		third-party/v8/out/native/obj.target/third_party/icu/libicuuc.a \
+		third-party/v8/out/native/obj.target/third_party/icu/libicudata.a \
+		$(OUTPUT_DIR)
 
 CREATE_DIRECTORIES:
 	@mkdir -p $(OUTPUT_DIR)
 	@mkdir -p $(OUTPUT_GENERATED_DIR)
 
 $(EXECUTABLE): generated.h $(OBJECTS)
-	$(CXX) $(shell find out/ -iname '*.o') out/libv8_base.a out/libv8_libbase.a out/libv8_libplatform.a  out/libv8_snapshot.a out/libicui18n.a out/libicuuc.a out/libicudata.a -pthread -o $(OUTPUT_DIR)/$@
-	@echo Link $(OUTPUT_DIR)/$@
+	@echo Linking $(OUTPUT_DIR)/$@
+	@$(CXX) $(shell find out/ -iname '*.o') \
+		out/libv8_base.a \
+		out/libv8_libbase.a \
+		out/libv8_libplatform.a \
+		out/libv8_snapshot.a \
+		out/libicui18n.a \
+		out/libicuuc.a \
+		out/libicudata.a \
+		-pthread -o $(OUTPUT_DIR)/$@
 
 generated.h: $(JAVASCRIPT_SOURCES)
 	@echo 'Generating sources from scripts using python'
@@ -64,8 +71,8 @@ generated.h: $(JAVASCRIPT_SOURCES)
 
 .cpp.o:
 	@mkdir -p $(dir $(OUTPUT_DIR)/$@)
-	$(CXX) -c $(CFLAGS) $(foreach path,$(INCLUDE_PATHS),-I$(path)) $< -o $(OUTPUT_DIR)/$(subst out/,,$@)
 	@echo CXX $<
+	@$(CXX) -c $(CFLAGS) $(foreach path,$(INCLUDE_PATHS),-I$(path)) $< -o $(OUTPUT_DIR)/$(subst out/,,$@)
 
 clean:
 	rm -rf $(OUTPUT_DIR)/*.o $(OUTPUT_GENERATED_DIR)/generated.cpp jsb

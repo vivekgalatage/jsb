@@ -7,5 +7,5 @@ script:
   - alias g++=clang++
   - objdump -p bin/jsb | grep GLIBC
   - make
-  - out/jsb third-party/libxml/libxml.jsb
   - out/jsb jsb.jsb
+  - out/jsb third-party/libxml/libxml.jsb
